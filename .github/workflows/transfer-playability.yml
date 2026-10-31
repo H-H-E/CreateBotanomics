@@ -1,0 +1,43 @@
+name: Import checksum-verified playability revision
+on:
+  push:
+    branches: [agent/playability-transfer-20261031]
+permissions:
+  contents: write
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Import the exact locally tested source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 2 --max-time 30 'https://sb-2sn13mr405px.vercel.run/playability.patch.xz' -o /tmp/playability.patch.xz
+          echo '179180900a49e06c0ad2ed23a3f027657e5ee1fb9b85ae6fb5b3ee71ca5fa89e  /tmp/playability.patch.xz' | sha256sum --check
+          python3 - <<'PY'
+          import lzma
+          from pathlib import Path
+          data = Path('/tmp/playability.patch.xz').read_bytes()
+          assert len(data) < 1000000
+          decoder = lzma.LZMADecompressor(memlimit=128*1024*1024)
+          patch = decoder.decompress(data, max_length=1000000)
+          assert decoder.eof and len(patch) < 1000000 and not decoder.unused_data
+          Path('/tmp/playability.patch').write_bytes(patch)
+          PY
+          git fetch origin main agent/playability-candidate-0.2.0
+          test "$(git rev-parse origin/main)" = '50b2147ac49310713b8577cad87d944a31a55816'
+          test "$(git rev-parse origin/agent/playability-candidate-0.2.0)" = 'c898f423c4a886c48dcbfbec95071a5c1282221b'
+          git checkout --detach c898f423c4a886c48dcbfbec95071a5c1282221b
+          git apply --check --index --unidiff-zero /tmp/playability.patch
+          git apply --index --unidiff-zero /tmp/playability.patch
+          test "$(git write-tree)" = '9f6de64a7cc0ec1966110b4aeea3e5aea5d08f1e'
+          if git diff --cached --name-only | grep -q '^.github/workflows/'; then exit 1; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Release 0.2.0: playable solo combat, physical modules and Lanterns compatibility' -m 'Add a command-free tutorial, WASD control, native saw and walking starters, Scrapbot AI, actual tracked-module detachment, automatic repair and saved workshop recovery. Pin released Sable 2.0.6 and optionally co-load Create Lanterns Alpha 20.11 without redistributing it. Verified locally with 41 unit tests, 15 native GameTests including collision-driven detachment and 20 repair cycles, plus rendered packaged-client play and restart recovery.'
+          git push origin HEAD:refs/heads/agent/playability-candidate-0.2.0
+          git rev-parse HEAD
