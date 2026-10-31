@@ -13,6 +13,11 @@ public final class BattleClient {
     private BattleClient() {}
 
     @SubscribeEvent
+    public static void keys(net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) {
+        event.register(PracticeClient.GARAGE); event.register(PracticeClient.RESET); PracticeClient.init();
+    }
+
+    @SubscribeEvent
     public static void screens(RegisterMenuScreensEvent event) {
         event.register(BattleBlocks.GARAGE_MENU.get(), GarageScreen::new);
     }

@@ -22,14 +22,14 @@
     },
     {
       "project": "sable",
-      "version": "2.0.4+mc1.21.1",
-      "version_id": "bMSNCogw",
-      "filename": "sable-neoforge-1.21.1-2.0.4.jar",
-      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/bMSNCogw/sable-neoforge-1.21.1-2.0.4.jar",
-      "sha512": "1536c676531f59d4658f994c698a8f649f3b21b0f7ff754644be5ff4154c88aba5f933686359198519bbe7d295e8d53f7d9148cfe0e93b09fe168f52ef4a33ed",
-      "size": 12986102,
+      "version": "2.0.6+mc1.21.1",
+      "version_id": "fg9dTRz9",
+      "filename": "sable-neoforge-1.21.1-2.0.6.jar",
+      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/fg9dTRz9/sable-neoforge-1.21.1-2.0.6.jar",
+      "sha512": "76d293ce751a01cb9c095a3659b0a41e03e005480bc9d76dfdc73ec7c2eabf7923740c7b077921d42616673c496cd5143569f2085ddcebe174fd91d81e2a04b8",
+      "size": 12986135,
       "optional": false,
-      "sha1": "d3d0518f91b559a65d8548e9b6f0a2f88bbc81d3"
+      "sha1": "cf46f7e8c1511f170abcdbee739944f0540549bf"
     },
     {
       "project": "create-aeronautics",

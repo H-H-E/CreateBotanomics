@@ -32,7 +32,11 @@ public final class BattleEvents {
         bus.addListener(BattleEvents::login);
     }
     private static void tick(LevelTickEvent.Post event) {
-        if (event.getLevel() instanceof ServerLevel level) BattleService.get(level).tick();
+        if (event.getLevel() instanceof ServerLevel level) {
+            if (education.poiesis.createbattlebots.practice.PracticeService.isPractice(level))
+                education.poiesis.createbattlebots.practice.PracticeService.get(level).tick();
+            else BattleService.get(level).tick();
+        }
     }
     private static void breakBlock(BlockEvent.BreakEvent event) {
         if (event.getLevel() instanceof ServerLevel level && BattleService.get(level).isProtected(event.getPos())) event.setCanceled(true);

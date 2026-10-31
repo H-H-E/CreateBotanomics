@@ -1,0 +1,10 @@
+> Task :compileGametestJava
+> Task :processGametestResources UP-TO-DATE
+> Task :gametestClasses
+		Create: Lanterns Alpha 20.11 20.11-alpha (createlanterns)
+[17:43:34] [modloading-worker-0/INFO] [io.gi.vi.cr.CreateLanterns/]: 26 of the mod's recipes copied to /vercel/CreateBotanomics/run/gametest/config/createlanterns/recipes/defaults for reference
+[17:43:35] [main/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [createbattlebots_test, createbattlebots]
+[17:43:40] [Server thread/INFO] [de.ry.sa.Sable/]: Using game directory relative Sable Rapier native directory /vercel/CreateBotanomics/run/gametest/.sable/natives
+[17:43:51] [Server thread/INFO] [minecraft/GameTestServer]: All 15 required tests passed :)
+BUILD SUCCESSFUL in 55s
+13 actionable tasks: 6 executed, 7 up-to-date

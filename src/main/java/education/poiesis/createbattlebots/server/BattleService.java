@@ -62,6 +62,7 @@ public final class BattleService {
         // Release native loading tickets before Sable serializes its worlds.
         SERVICES.values().forEach(service -> service.physics.clear());
     }
+    public boolean isPilotLocked(UUID player) { return data.bots.values().stream().anyMatch(b -> b.owner.equals(player) && isLocked(b)); }
     public Collection<ArenaRecord> arenas() { return List.copyOf(data.arenas.values()); }
     public Collection<BotRecord> bots() { return List.copyOf(data.bots.values()); }
     public Optional<ArenaRecord> arenaAt(Vec3 pos) { return data.arenas.values().stream().filter(a -> a.contains(pos)).findFirst(); }
@@ -485,7 +486,7 @@ public final class BattleService {
         player.sendSystemMessage(Component.literal("Create: Battle Bots\n1. Build with Create / Simulated and add one Battle Transponder. Add Combat Armor and Damage Relays as hit zones. A failed relay outputs 15: connect it to a clutch.\n2. Assemble, then /battlebots bot register <name> <x> <y> <z> <ground|aerial|walking|hybrid>. Attach every jointed child with bot attach.\n3. Referee: /battlebots arena create <name> <from> <to>. Both pilots: /battlebots join <arena> <bot>.\n4. Place a Garage Console inside the arena, open it and start a human or autonomous match.\n5. /battlebots surrender ends your match; both machines repair automatically. /battlebots diagnostics checks the setup.").withStyle(ChatFormatting.GRAY));
     }
     public String diagnostics() {
-        return "Create: Battle Bots 0.1.0 · NeoForge 1.21.1 · Sable hit-zone API\n" + data.arenas.size() + " arenas, " + data.bots.size() + " robots, " + data.pending.size() + " active/recovery records\n"
+        return "Create: Battle Bots 0.2.0 · NeoForge 1.21.1 · Sable hit-zone API\n" + data.arenas.size() + " arenas, " + data.bots.size() + " robots, " + data.pending.size() + " active/recovery records\n"
                 + String.format(Locale.ROOT, "Last gameplay tick %.3f ms; dropped collision observations %d\n", lastTickNanos / 1_000_000.0, physics.droppedContacts(level))
                 + "Damage targets: transponders, combat armor and damage relays. Related bodies require explicit attach. Ordinary machinery, joints and inventories remain native.";
     }

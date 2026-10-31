@@ -20,16 +20,18 @@ public final class CreateBattleBots {
 
     public CreateBattleBots(IEventBus bus, ModContainer container) {
         BattleBlocks.register(bus);
+        bus.addListener(education.poiesis.createbattlebots.network.PracticeNetwork::register);
         bus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
             // Native loading-ticket types must exist before a saved world's body tickets are read.
             new education.poiesis.createbattlebots.compat.sable.SablePhysicsAdapter();
+            education.poiesis.createbattlebots.practice.PracticeRig.init();
         }));
         if (net.neoforged.fml.ModList.get().isLoaded("computercraft"))
             education.poiesis.createbattlebots.compat.computercraft.ComputerCraftCompat.register(bus);
         container.registerConfig(ModConfig.Type.SERVER, BattleConfig.SPEC);
         NeoForge.EVENT_BUS.addListener(BattleCommands::register);
         BattleEvents.register();
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppingEvent event) -> BattleService.shutdown());
-        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> BattleService.clear());
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppingEvent event) -> { education.poiesis.createbattlebots.practice.PracticeService.shutdown(); BattleService.shutdown(); });
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> { education.poiesis.createbattlebots.practice.PracticeService.clear(); BattleService.clear(); });
     }
 }

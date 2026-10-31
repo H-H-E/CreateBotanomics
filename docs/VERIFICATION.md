@@ -1,3 +1,77 @@
+# Verification — 0.2.0 playability release
+
+Date: 31 October 2026. The requested Minecraft Agent Skills modding, testing and
+CI/release guidance was used; the implementation was checked against the actual
+pinned dependency binaries and exercised in Minecraft rather than inferred from
+API names.
+
+## Automated proof
+
+- **41 JUnit tests passed**, including eight new input, dead-man timeout, AI and
+  sensor-based tutorial tests.
+- **15 native Minecraft GameTests passed** with Sable 2.0.6, Create 6.0.10,
+  Aeronautics/Simulated/Offroad 1.3.2, Lanterns Alpha 20.11 and ComputerCraft.
+- The four new native tests prove forward driving, turning, rotor motion, a
+  walking starter, actual wheel/leg detachment, twenty detach/repair cycles,
+  preservation of all original body identities and a chest containing seventeen
+  diamonds, plus AI pursuit causing actual collision-driven detachment through
+  the same damage path used by live practice matches.
+- Both no-optional-mod and Lanterns-without-ComputerCraft suites also passed
+  before the last damage-balance change. The committed CI matrix reruns all four
+  combinations against the submitted revision; the release job independently
+  gates publication on those same configurations.
+
+Machine-readable local results and the tested JAR checksum are in
+[verification/0.2.0/summary.json](verification/0.2.0/summary.json). GitHub Actions
+uploads the full per-configuration reports instead of relying on this document
+as a claim of CI success.
+
+## Rendered gameplay and recovery
+
+A real Minecraft client loaded the packaged mod JAR (not a gametest-only
+implementation) with Lanterns installed. The B-key garage, generated workshop,
+three-step movement/turn/saw tutorial, automatic countdown, AI approach, impact
+feedback, detached modules, result screen and automatic repair were exercised
+using keyboard/mouse input. Read-only runtime inspection recorded the HUD/session
+state alongside the rendered game.
+
+A completed post-balance fight reported **126 impacts and three detached parts**,
+ended by decision, and restored both cores to 120 with the rematch control ready.
+The live player lost two modules; the remaining native bodies were not replaced.
+A prior completed fight ended by ring-out. The existing saved workshop was then
+reloaded through a fresh packaged-client process and re-entered successfully.
+The native repair test separately proves twenty resets without extra bodies or
+inventory duplication.
+
+Two defects found during actual play were fixed rather than hidden: starter
+copper decoration oxidized and correctly failed the snapshot identity check, so
+it now uses waxed copper; and Sable's impulse methods use local coordinates while
+its velocity readback is world-space, so arcade steering/drive impulses now
+explicitly transform between frames. The AI collision test covers rotated bots.
+The initial damage balance also produced too few module failures; the tuned
+setting is covered by a real-contact detachment assertion, not a synthetic hit.
+
+A dedicated NeoForge server with the new dependency stack and practice dimension
+reached its ready state. The final native suites run server-side without client
+classes. The packaged-client runs were on Linux x86_64 using a software renderer;
+this is not a performance benchmark for a player's GPU. Sable emitted transient
+late movement-packet warnings while entering a previously loaded workshop; no
+session failure occurred in the completed round. Windows/macOS native execution,
+long public-server load tests and new-release multi-client play have not been
+claimed from these checks.
+
+The physical destruction guarantee is deliberately scoped to the starter's
+tracked native modules. The walker uses arcade traction assistance. Do not infer
+arbitrary Lanterns construct restoration or every third-party joint graph from a
+successful co-load test. See [LANTERNS.md](LANTERNS.md) and
+[IMPLEMENTATION.md](IMPLEMENTATION.md).
+
+---
+
+## Archived evidence for the earlier 0.1.0 release
+
+The following is historical evidence, not a report of additional 0.2.0 runs.
+
 # Verification — 0.1.0
 
 These are executed results for the initial release, not a checklist of intended tests.

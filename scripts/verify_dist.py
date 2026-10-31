@@ -22,6 +22,12 @@ def main():
         assert metadata["mods"][0]["modId"] == "createbattlebots"
         assert "${" not in metadata["mods"][0]["version"], "Unexpanded version"
         assert metadata["mods"][0]["version"].endswith("+mc1.21.1")
+        assert "education/poiesis/createbattlebots/practice/PracticeService.class" in names, "Missing solo loop"
+        assert "assets/createbattlebots/models/block/combat_saw.json" in names
+        assert "data/createbattlebots/dimension/workshop.json" in names
+        assert not any("createlanterns" in p.lower() for p in names), "Lanterns must not be redistributed"
+        sable = next(d for d in metadata["dependencies"]["createbattlebots"] if d["modId"] == "sable")
+        assert sable["versionRange"] == "[2.0.6]", "Release must match the tested Sable binary"
         for name in names:
             if name.endswith(".json"):
                 json.loads(archive.read(name))

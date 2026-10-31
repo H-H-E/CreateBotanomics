@@ -1,3 +1,50 @@
+# Your first fight: no commands required
+
+1. Install the matched client/server pack, open any world and press **B**.
+2. Choose **Spinner starter** or **Walking starter**. Each has its own saved workshop.
+3. Complete the tutorial by driving three blocks with W/S, turning with A/D, and
+   spinning the saw with Space. Progress is based on actual movement, not a timer.
+4. The tutorial restores the starting positions and starts a three-second
+   countdown. Fight Scrapbot for up to two minutes: break the core, disable its
+   legs, push it outside the yellow boundary, or win the damage/aggression decision.
+5. The result explains the outcome and counts impacts and detached parts. Both
+   bots repair automatically. Press B for **Reset / rematch**, or use R.
+
+R forfeits an active match before resetting. It does not secretly rescue a losing
+round. Opening the garage or losing focus releases throttle. WASD follows the
+robot's facing, not the player's mouse. Space runs the rotor; release it to brake.
+Key bindings can be changed in Minecraft's Controls menu.
+
+**Build between fights:** press B and choose **Edit in workshop**. Creative players
+can change their own starter's blocks; its original transponder and five module
+hubs are protected. **Test drive** lets you check changes before another round.
+Save new edits by starting a test drive, starting a fight, or leaving the workshop.
+The six existing body identities and live inventories are retained during repair.
+Use non-decaying decorations, such as waxed copper: structural block changes
+outside the combat model intentionally stop recovery instead of being overwritten.
+Extra connected bodies require the separate custom-build workflow below.
+
+Choose **Return to your world** to go back with the same inventory and game mode.
+Disconnecting or restarting interrupts the practice round; the saved workshop is
+recovered, not silently regenerated. A reconnecting player is returned home and
+can re-enter with B. If recovery pauses, restore the named structural block or
+resolve the missing body, then choose **Retry recovery**. You can still return
+home while an operator investigates. Keep `battlebots/` with world backups.
+
+The walker uses real articulated legs plus limited arcade traction assistance.
+Detachable wheels, legs and the saw rotor remain physical debris. Breaking a
+mount changes handling; restoring a round rejoins the original modules. This is
+not arbitrary fracture of every block in every third-party mod.
+
+The fallback commands `/battlebots practice`, `/battlebots practice walker`, and
+`/battlebots leave` provide the same entry/exit actions. Server operators can
+turn starter practice off or reduce concurrent sessions in the server config.
+Lanterns users should read [the pinned compatibility guide](LANTERNS.md).
+
+---
+
+## Custom-build tournament workflow
+
 # Build your first Battle Bots round
 
 Battle Bots runs in a singleplayer world, an opened-to-LAN world, or a dedicated

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Install the locked runtime without redistributing third-party mod binaries.
 
-Client: python3 scripts/install_modpack.py --target /path/to/instance --mod-jar build/libs/createbattlebots-0.1.0+mc1.21.1.jar
+Client: python3 scripts/install_modpack.py --target /path/to/instance --mod-jar build/libs/createbattlebots-0.2.0+mc1.21.1.jar
 Server: add --server, and read https://aka.ms/MinecraftEULA before --accept-eula.
 The client instance must already use the locked NeoForge version and Java 21.
 """

@@ -19,7 +19,7 @@ subprocess.run([sys.executable, str(ROOT / "scripts/package_modpack.py"), "--mod
 with zipfile.ZipFile(destination / (jar.stem + "-server-kit.zip"), "w", zipfile.ZIP_DEFLATED) as archive:
     archive.write(jar, "mods/" + jar.name)
     for name in ("README.md", "LICENSE", "modpack.lock.json", "scripts/install_modpack.py",
-                 "docs/PLAYING.md", "docs/IMPLEMENTATION.md", "docs/VERIFICATION.md",
+                 "docs/PLAYING.md", "docs/IMPLEMENTATION.md", "docs/VERIFICATION.md", "docs/LANTERNS.md",
                  "examples/lua/arena_controller.lua"):
         archive.write(ROOT / name, name)
 print(f"Packaged server kit in {destination}")

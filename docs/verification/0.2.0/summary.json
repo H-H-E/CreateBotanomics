@@ -1,0 +1,56 @@
+{
+  "version": "0.2.0",
+  "date_utc": "2026-10-31",
+  "tested_jar_sha256": "56cf1cee12091d6fba513ef1c7ac511f39cd5835f7e81e42c42966360831416a",
+  "java": "21",
+  "neoforge": "21.1.247",
+  "minecraft": "1.21.1",
+  "sable": "2.0.6",
+  "lanterns": "20.11-alpha (CurseForge file 9360511)",
+  "junit": [
+    {
+      "name": "education.poiesis.createbattlebots.compat.sable.BoundedContactBufferTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "education.poiesis.createbattlebots.core.SnapshotDigestTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "education.poiesis.createbattlebots.core.MatchEngineTest",
+      "tests": "17",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "education.poiesis.createbattlebots.core.ArenaBoundsTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "education.poiesis.createbattlebots.core.DamageResolverTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "education.poiesis.createbattlebots.core.PracticeRulesTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "native_integration": {
+    "required": 15,
+    "failed": 0,
+    "final_run": "2026-10-31 17:43:51 UTC",
+    "optional_mods": "Lanterns and ComputerCraft enabled",
+    "evidence": "native-result.txt"
+  },
+  "scope": "Linux x86_64, native physics tests plus a rendered packaged client. Not a general third-party fracture or public-server load certification."
+}

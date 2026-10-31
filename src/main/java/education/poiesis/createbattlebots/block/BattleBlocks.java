@@ -31,18 +31,20 @@ public final class BattleBlocks {
     public static final DeferredBlock<BattleNodeBlock> RELAY = BLOCKS.register("damage_relay", () -> new BattleNodeBlock(properties(), BattleNodeBlock.Kind.RELAY));
     public static final DeferredBlock<GarageBlock> GARAGE = BLOCKS.register("garage_console", () -> new GarageBlock(properties()));
     public static final DeferredBlock<GarageBlock> ARENA_CONTROLLER = BLOCKS.register("arena_controller", () -> new GarageBlock(properties()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BattleNodeEntity>> NODE_ENTITY = ENTITIES.register("battle_node", () -> BlockEntityType.Builder.of(BattleNodeEntity::new, TRANSPONDER.get(), ARMOR.get(), RELAY.get()).build(null));
+    public static final DeferredBlock<CombatPartBlock> WHEEL = BLOCKS.register("combat_wheel", () -> new CombatPartBlock(properties().noOcclusion(), true));
+    public static final DeferredBlock<CombatPartBlock> SAW = BLOCKS.register("combat_saw", () -> new CombatPartBlock(properties().noOcclusion(), false));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BattleNodeEntity>> NODE_ENTITY = ENTITIES.register("battle_node", () -> BlockEntityType.Builder.of(BattleNodeEntity::new, TRANSPONDER.get(), ARMOR.get(), RELAY.get(), WHEEL.get(), SAW.get()).build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<GarageMenu>> GARAGE_MENU = MENUS.register("garage", () -> IMenuTypeExtension.create((id, inv, data) -> new GarageMenu(id, inv, data.readBlockPos())));
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("battle_bots", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.createbattlebots"))
             .icon(() -> TRANSPONDER.asItem().getDefaultInstance())
-            .displayItems((params, output) -> { output.accept(TRANSPONDER); output.accept(ARMOR); output.accept(RELAY); output.accept(GARAGE); output.accept(ARENA_CONTROLLER); }).build());
+            .displayItems((params, output) -> { output.accept(TRANSPONDER); output.accept(ARMOR); output.accept(RELAY); output.accept(GARAGE); output.accept(ARENA_CONTROLLER); output.accept(WHEEL); output.accept(SAW); }).build());
 
     private static BlockBehaviour.Properties properties() {
         return BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(3.0f, 1200.0f).sound(SoundType.COPPER).requiresCorrectToolForDrops();
     }
     public static void register(IEventBus bus) {
-        for (var block : new DeferredBlock[]{TRANSPONDER, ARMOR, RELAY, GARAGE, ARENA_CONTROLLER}) {
+        for (var block : new DeferredBlock[]{TRANSPONDER, ARMOR, RELAY, GARAGE, ARENA_CONTROLLER, WHEEL, SAW}) {
             ITEMS.register(block.getId().getPath(), () -> new BlockItem((net.minecraft.world.level.block.Block) block.get(), new Item.Properties()));
         }
         BLOCKS.register(bus); ITEMS.register(bus); ENTITIES.register(bus); MENUS.register(bus); TABS.register(bus);

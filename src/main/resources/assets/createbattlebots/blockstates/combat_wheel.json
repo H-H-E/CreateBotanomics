@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "disabled=false": {
+      "model": "createbattlebots:block/combat_wheel"
+    },
+    "disabled=true": {
+      "model": "createbattlebots:block/combat_wheel_disabled"
+    }
+  }
+}

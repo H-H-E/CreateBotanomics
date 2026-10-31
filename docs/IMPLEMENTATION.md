@@ -1,4 +1,50 @@
-# Implementation contract — 0.1.0
+# Implementation contract — 0.2.0
+
+## New solo practice loop
+
+The `practice` package is an isolated vertical slice layered alongside, not in
+place of, the existing tournament service. Client B/R bindings and a versioned
+button-only protocol drive a server-owned session in `createbattlebots:workshop`.
+No client can choose a body UUID, pose, force or damage amount.
+
+Each starter is six native Sable sublevels and five explicitly owned rotary
+constraints: a chassis, four wheels or articulated legs, and a saw rotor. The
+human and AI use the same bounded input/impulse/motor interface. Arcade assistance
+supports traction and yaw, not gravity, pitch or roll. Movement is not teleportation.
+The AI steers toward the opponent, reverses after getting stuck and avoids the
+edge. There is no hidden teleport recovery or special AI damage multiplier.
+
+Opponent-caused contacts can exhaust a mount or child hit zone and remove its
+owned constraint. The original sublevel persists as colliding debris. Lost wheel
+or leg count reduces traction and produces steering bias. Scoring and KO/ring-out/
+disconnect/timeout rules use the shared server match engine. The tutorial observes
+real translation, turn angle and rotor velocity before unlocking the first fight.
+
+Practice snapshots retain original body IDs, block identity/counts, node health
+and native poses. Repair validates the original bodies, restores their poses and
+node health, and recreates only the five owned joints. Live block entities and
+inventories are not cloned or replayed. The checksummed, bounded, atomically
+replaced practice registry has a previous-file backup. On restart, known parked
+rigs recover their transient joints before resuming. Corruption or externally
+changed geometry pauses practice without deleting the world or generating a
+replacement bot. An interrupted prefab build is marked and retained for operator
+inspection instead of overwriting its occupied cell.
+
+The public limits are four simultaneous sessions by default (configurable up to
+eight), sixteen saved starter slots, 512 blocks per starter, and exactly its six
+tracked bodies. These bounds belong only to the optional starter mode. Arbitrary
+user-made builds remain in the older registration/tournament path below.
+
+## Explicitly not claimed
+
+- Arbitrary fracture and reconstruction of unrelated Create/Sable/Lanterns parts.
+- A purely mechanical, unassisted walking gait.
+- Advanced autonomous programming, flight polish, tournaments or slow-motion replays.
+- Compatibility with untested later Sable or Lanterns versions.
+- Public-server load certification, Windows/macOS native testing, or proof that
+  every unrestricted workshop build is balanced or fun.
+
+# Existing custom-build tournament contract
 
 This document separates implemented behavior from the broader design proposal.
 

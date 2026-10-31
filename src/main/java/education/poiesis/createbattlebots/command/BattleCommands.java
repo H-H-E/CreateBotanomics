@@ -28,6 +28,14 @@ public final class BattleCommands {
         event.getDispatcher().register(literal("battlebots")
                 .executes(ctx -> run(ctx, null, (service, player) -> service.showHelp(player)))
                 .then(literal("help").executes(ctx -> run(ctx, null, (service, player) -> service.showHelp(player))))
+                 .then(literal("practice").executes(ctx -> {
+                    education.poiesis.createbattlebots.practice.PracticeService.action(ctx.getSource().getPlayerOrException(),0); return 1;
+                }).then(literal("walker").executes(ctx -> {
+                    education.poiesis.createbattlebots.practice.PracticeService.action(ctx.getSource().getPlayerOrException(),1); return 1;
+                })))
+                .then(literal("leave").executes(ctx -> {
+                    education.poiesis.createbattlebots.practice.PracticeService.action(ctx.getSource().getPlayerOrException(),5); return 1;
+                }))
                 .then(literal("diagnostics").executes(ctx -> {
                     ctx.getSource().sendSuccess(() -> Component.literal(service(ctx).diagnostics()), false);
                     return 1;

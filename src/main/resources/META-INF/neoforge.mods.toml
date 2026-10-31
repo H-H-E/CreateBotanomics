@@ -38,7 +38,7 @@ side="BOTH"
 [[dependencies.createbattlebots]]
 modId="sable"
 type="required"
-versionRange="[2.0.4]"
+versionRange="[2.0.6]"
 ordering="AFTER"
 side="BOTH"
 
@@ -67,5 +67,13 @@ side="BOTH"
 modId="computercraft"
 type="optional"
 versionRange="[1.115.1,2)"
+ordering="AFTER"
+side="BOTH"
+
+# Optional co-load target, not a source or asset redistribution.
+[[dependencies.createbattlebots]]
+modId="createlanterns"
+type="optional"
+versionRange="[20.11-alpha,21)"
 ordering="AFTER"
 side="BOTH"

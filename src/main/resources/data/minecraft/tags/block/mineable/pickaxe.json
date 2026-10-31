@@ -5,6 +5,8 @@
     "createbattlebots:combat_armor",
     "createbattlebots:damage_relay",
     "createbattlebots:garage_console",
-    "createbattlebots:arena_controller"
+    "createbattlebots:arena_controller",
+    "createbattlebots:combat_wheel",
+    "createbattlebots:combat_saw"
   ]
 }
