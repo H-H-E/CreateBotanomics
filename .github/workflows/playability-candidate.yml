@@ -12,29 +12,26 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: eab0cdab198a7ae9422800d0e8af77b6a38f61a5
+          ref: e93746f65e7afa765e37d74883a61def9a35edb5
       - name: Apply checksummed implementation patch
         env:
           GH_TOKEN: ${{ github.token }}
         shell: python
         run: |
           import base64, gzip, hashlib, json, os, pathlib, subprocess, urllib.request
-          shas=['c3eda5157d7433555abe20502da19836a491fcdb','4119ad8041e8f3d638f764c18cc0c572eff15df2','352ed42d48373d528fac606ee744c6d241c3e5ee','61734db000c73ad2dc040cf07a13fc0fffebaf19']
-          data=b''
-          for sha in shas:
-              req=urllib.request.Request('https://api.github.com/repos/H-H-E/CreateBotanomics/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
-              with urllib.request.urlopen(req,timeout=60) as r: data+=base64.b64decode(json.load(r)['content'])
-          assert hashlib.sha256(data).hexdigest()=='8d49fd9fd3deea9000a8154ad3160be73298f46863cf731fca1fd49221f7a01a'
+          req=urllib.request.Request('https://api.github.com/repos/H-H-E/CreateBotanomics/git/blobs/2ec66dad518f4019d88838eae3b23e20b9e6c913',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(req,timeout=60) as r: data=base64.b64decode(json.load(r)['content'])
+          assert hashlib.sha256(data).hexdigest()=='cb8559effe57a1b1a7a0b8f7afe0ea59ee99c23b3b73b862974af0e56548290b'
           pathlib.Path('/tmp/implementation.patch').write_bytes(gzip.decompress(data))
           subprocess.run(['git','apply','--check','/tmp/implementation.patch'],check=True)
           subprocess.run(['git','apply','/tmp/implementation.patch'],check=True)
-      - name: Preserve reviewable candidate source (never promote main here)
+      - name: Preserve reviewable candidate source
         run: |
           git config user.name 'Hussein'
           git config user.email '59151492+H-H-E@users.noreply.github.com'
-          git add src build.gradle gradle.properties modpack.lock.json scripts
-          git commit -m 'Implement solo tutorial, native break-off practice robots, AI and rematch; target Sable 2.0.6'
-          git push origin HEAD:refs/heads/playability-candidate-1
+          git add src build.gradle
+          git commit -m 'Isolate native tests and verify the packaged tutorial, driving, rematch and return UI'
+          git push origin HEAD:refs/heads/playability-candidate-2
           mkdir -p evidence
           git rev-parse HEAD > evidence/commit.txt
           git archive --format=zip HEAD > evidence/source.zip
@@ -48,13 +45,25 @@ jobs:
       - name: Native physics, collisions, detach and repair with Lanterns
         run: ./gradlew runGameTestServer --no-daemon -PwithLanterns=true -PwithComputerCraft=false
       - name: Verify optional Lanterns download
-        shell: python
+        run: python3 scripts/install_modpack.py --target /tmp/lanterns-install-check --with-lanterns --without-computercraft --mod-jar build/libs/createbattlebots-0.2.0+mc1.21.1.jar
+      - name: Prepare exact-JAR integrated client
         run: |
-          import json,urllib.request,hashlib
-          lock=json.load(open('modpack.lock.json'))
-          for mod in lock['mods']:
-              if mod.get('id')=='createlanterns':
-                  print(mod)
+          mkdir -p run/packaged-client/mods run/packaged-client/saves/PracticeSmoke
+          cp build/libs/createbattlebots-0.2.0+mc1.21.1.jar run/packaged-client/mods/
+          world=$(find run/gametest -name level.dat -print -quit)
+          test -n "$world"
+          cp -a "$(dirname "$world")/." run/packaged-client/saves/PracticeSmoke/
+          printf 'guiScale:2\nrenderDistance:6\nsimulationDistance:6\nmaxFps:60\nfullscreen:false\nsoundCategory_master:0.4\n' > run/packaged-client/options.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0 libopenal1
+      - name: Rendered packaged-client tutorial and rematch
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          ALSOFT_DRIVERS: 'null'
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' timeout 420s ./gradlew runPackagedClient --no-daemon -PjoinWorld=PracticeSmoke -PwithLanterns=true -PwithComputerCraft=false
+          test -f run/packaged-client/smoke-success.txt
+          cat run/packaged-client/smoke-success.txt
       - name: Package distributions
         run: python3 scripts/package_release.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -69,5 +78,9 @@ jobs:
             build/test-results/
             run/gametest/logs/
             run/gametest/crash-reports/
+            run/packaged-client/logs/
+            run/packaged-client/crash-reports/
+            run/packaged-client/screenshots/
+            run/packaged-client/smoke-*.txt
           retention-days: 3
           if-no-files-found: error
