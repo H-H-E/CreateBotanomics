@@ -1,0 +1,73 @@
+name: Playability candidate
+on:
+  push:
+    branches: [playability-validation]
+    paths: ['.github/workflows/playability-candidate.yml']
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: eab0cdab198a7ae9422800d0e8af77b6a38f61a5
+      - name: Apply checksummed implementation patch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import base64, gzip, hashlib, json, os, pathlib, subprocess, urllib.request
+          shas=['c3eda5157d7433555abe20502da19836a491fcdb','4119ad8041e8f3d638f764c18cc0c572eff15df2','352ed42d48373d528fac606ee744c6d241c3e5ee','61734db000c73ad2dc040cf07a13fc0fffebaf19']
+          data=b''
+          for sha in shas:
+              req=urllib.request.Request('https://api.github.com/repos/H-H-E/CreateBotanomics/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=60) as r: data+=base64.b64decode(json.load(r)['content'])
+          assert hashlib.sha256(data).hexdigest()=='8d49fd9fd3deea9000a8154ad3160be73298f46863cf731fca1fd49221f7a01a'
+          pathlib.Path('/tmp/implementation.patch').write_bytes(gzip.decompress(data))
+          subprocess.run(['git','apply','--check','/tmp/implementation.patch'],check=True)
+          subprocess.run(['git','apply','/tmp/implementation.patch'],check=True)
+      - name: Preserve reviewable candidate source (never promote main here)
+        run: |
+          git config user.name 'Hussein'
+          git config user.email '59151492+H-H-E@users.noreply.github.com'
+          git add src build.gradle gradle.properties modpack.lock.json scripts
+          git commit -m 'Implement solo tutorial, native break-off practice robots, AI and rematch; target Sable 2.0.6'
+          git push origin HEAD:refs/heads/playability-candidate-1
+          mkdir -p evidence
+          git rev-parse HEAD > evidence/commit.txt
+          git archive --format=zip HEAD > evidence/source.zip
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+      - name: Compile and run unit tests with Lanterns
+        run: ./gradlew build --no-daemon -PwithLanterns=true -PwithComputerCraft=false
+      - name: Native physics, collisions, detach and repair with Lanterns
+        run: ./gradlew runGameTestServer --no-daemon -PwithLanterns=true -PwithComputerCraft=false
+      - name: Verify optional Lanterns download
+        shell: python
+        run: |
+          import json,urllib.request,hashlib
+          lock=json.load(open('modpack.lock.json'))
+          for mod in lock['mods']:
+              if mod.get('id')=='createlanterns':
+                  print(mod)
+      - name: Package distributions
+        run: python3 scripts/package_release.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: playability-candidate-${{ github.run_number }}
+          path: |
+            evidence/
+            build/libs/
+            build/distributions/
+            build/reports/tests/
+            build/test-results/
+            run/gametest/logs/
+            run/gametest/crash-reports/
+          retention-days: 3
+          if-no-files-found: error
