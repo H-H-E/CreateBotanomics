@@ -15,13 +15,14 @@ concurrency:
 
 jobs:
   verify:
-    name: Java 21 / CC ${{ matrix.computercraft }}
+    name: Java 21 / CC ${{ matrix.computercraft }} / Lanterns ${{ matrix.lanterns }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         computercraft: ['true', 'false']
+        lanterns: ['false', 'true']
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,14 +36,14 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: Build and run pure-rule tests
-        run: ./gradlew build --no-daemon -PwithComputerCraft=${{ matrix.computercraft }}
+        run: ./gradlew build --no-daemon -PwithComputerCraft=${{ matrix.computercraft }} -PwithLanterns=${{ matrix.lanterns }}
       - name: Run actual Minecraft integration tests
-        run: ./gradlew runGameTestServer --no-daemon -PwithComputerCraft=${{ matrix.computercraft }}
+        run: ./gradlew runGameTestServer --no-daemon -PwithComputerCraft=${{ matrix.computercraft }} -PwithLanterns=${{ matrix.lanterns }}
       - name: Package client pack and server kit
-        if: matrix.computercraft == 'true'
+        if: matrix.computercraft == 'true' && matrix.lanterns == 'false'
         run: python3 scripts/package_release.py
       - name: Upload installable artifacts
-        if: matrix.computercraft == 'true'
+        if: matrix.computercraft == 'true' && matrix.lanterns == 'false'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: createbattlebots-${{ github.sha }}
@@ -54,10 +55,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: test-reports-cc-${{ matrix.computercraft }}
+          name: test-reports-cc-${{ matrix.computercraft }}-lanterns-${{ matrix.lanterns }}
           path: |
             build/reports/tests/
             build/test-results/
             run/gametest/logs/
             run/gametest/crash-reports/
           if-no-files-found: warn
+

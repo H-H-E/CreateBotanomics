@@ -41,6 +41,8 @@ jobs:
         run: |
           ./gradlew verifyReleaseVersion build runGameTestServer --no-daemon -PreleaseModVersion="$RELEASE_VERSION"
           ./gradlew runGameTestServer --no-daemon -PwithComputerCraft=false
+          ./gradlew runGameTestServer --no-daemon -PwithLanterns=true
+          ./gradlew runGameTestServer --no-daemon -PwithLanterns=true -PwithComputerCraft=false
           python3 scripts/package_release.py
       - name: Recheck publication has not already happened
         id: publish_guard
@@ -62,3 +64,4 @@ jobs:
           overwrite_files: false
           generate_release_notes: true
           prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+
