@@ -162,8 +162,13 @@ public final class PracticeService {
         }
         if (slot >= BattleConfig.PRACTICE_SLOTS.get()) throw new IllegalStateException("All practice bays are occupied. Try again after another player exits.");
         Session s = new Session(player.getUUID(), slot);
-        prepareArena(s.center);
-        replaceBots(s);
+        sessions.put(s.owner, s); // Track ownership before allocating any native bodies.
+        try {
+            prepareArena(s.center);
+            replaceBots(s);
+        } catch (RuntimeException failure) {
+            close(s); sessions.remove(s.owner); throw failure;
+        }
         CompoundTag home = new CompoundTag();
         home.putString("dimension", player.level().dimension().location().toString());
         home.putDouble("x", player.getX()); home.putDouble("y", player.getY()); home.putDouble("z", player.getZ());
@@ -220,7 +225,11 @@ public final class PracticeService {
         List<SablePhysicsAdapter.ImpactContact> contacts = physics.drainContacts(level, 512);
         for (Session s : new ArrayList<>(sessions.values())) {
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(s.owner);
-            if (player == null || player.serverLevel() != level) { close(s); sessions.remove(s.owner); continue; }
+            if (player == null || player.serverLevel() != level) {
+                close(s); sessions.remove(s.owner); lastAction.remove(s.owner);
+                if (player != null) { restorePlayer(player); PacketDistributor.sendToPlayer(player, PracticeNetwork.State.closed()); }
+                continue;
+            }
             try {
                 if (s.lastInput < ticks - PracticeRules.INPUT_TIMEOUT) s.input = PracticeRules.Input.STOP;
                 if (s.phase == COUNTDOWN) {
@@ -308,7 +317,8 @@ public final class PracticeService {
         sound(s, win ? SoundEvents.PLAYER_LEVELUP : SoundEvents.IRON_GOLEM_DEATH, .7f, 1);
     }
     private void sound(Session s, net.minecraft.sounds.SoundEvent sound, float volume, float pitch) {
-        level.playSound(null, s.center.above(3), sound, SoundSource.BLOCKS, volume * 3, pitch);
+        ServerPlayer listener = level.getServer().getPlayerList().getPlayer(s.owner);
+        if (listener != null) listener.playNotifySound(sound, SoundSource.MASTER, volume, pitch);
     }
     private void send(ServerPlayer player, Session s) {
         String task = s.phase == TUTORIAL ? switch (s.tutorial) {
@@ -321,9 +331,10 @@ public final class PracticeService {
                 : s.phase == ERROR ? "Practice stopped. Choose a fresh design or return to your world."
                 : s.headline;
         PacketDistributor.sendToPlayer(player, new PracticeNetwork.State(s.phase, task, s.feedback,
-                (int)s.playerBot.coreHealth, (int)s.opponent.coreHealth, s.playerBot.lostParts(), s.opponent.lostParts(),
+                s.playerBot == null ? 0 : (int)s.playerBot.coreHealth, s.opponent == null ? 0 : (int)s.opponent.coreHealth,
+                s.playerBot == null ? 0 : s.playerBot.lostParts(), s.opponent == null ? 0 : s.opponent.lostParts(),
                 Math.max(0, (PracticeRules.ROUND_TICKS - s.roundTicks) / 20), s.wins, s.losses,
-                s.design, s.tune, s.easy, (int)(s.playerBot.weaponSpeed * 60 / (2 * Math.PI))));
+                s.design, s.tune, s.easy, s.playerBot == null ? 0 : (int)(s.playerBot.weaponSpeed * 60 / (2 * Math.PI))));
     }
     private void exit(ServerPlayer player) {
         Session s = sessions.remove(player.getUUID());
@@ -344,7 +355,7 @@ public final class PracticeService {
         var container = SubLevelContainer.getContainer(level);
         for (var body : List.copyOf(container.getAllSubLevels())) {
             CompoundTag tag = body.getUserDataTag();
-            if (tag.hasUUID(PracticeBot.OWNER_TAG) && !live.contains(body.getUniqueId())) {
+            if (tag != null && tag.hasUUID(PracticeBot.OWNER_TAG) && !live.contains(body.getUniqueId())) {
                 container.removeForceLoadTicket(body, PracticeBot.TICKET, tag.getUUID(PracticeBot.OWNER_TAG));
                 container.removeSubLevel(body, SubLevelRemovalReason.REMOVED);
             }

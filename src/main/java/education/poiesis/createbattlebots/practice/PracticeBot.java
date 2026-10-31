@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import java.util.*;
 
@@ -46,6 +45,7 @@ public final class PracticeBot {
         public final int side;
         public final CompoundTag pose;
         public final int blockCount;
+        public Map<BlockPos, net.minecraft.world.level.block.state.BlockState> structure = Map.of();
         public RotaryConstraintHandle joint;
         public double health = 65;
         public long lastHit = -100;
@@ -113,13 +113,17 @@ public final class PracticeBot {
                      Vector3d axis, boolean weapon, int side) {
         ServerSubLevel body = SubLevelAssemblyHelper.assembleBlocks(level, anchor, blocks, BoundingBox3i.from(blocks));
         body.setName("Battle Bots practice: " + name);
-        CompoundTag data = body.getUserDataTag().copy(); data.putUUID(OWNER_TAG, owner); body.setUserDataTag(data);
+        CompoundTag data = body.getUserDataTag() == null ? new CompoundTag() : body.getUserDataTag().copy(); data.putUUID(OWNER_TAG, owner); body.setUserDataTag(data);
         body.updateBoundingBox();
         if (!SubLevelContainer.getContainer(level).addForceLoadTicket(body, TICKET, owner)) {
             SubLevelContainer.getContainer(level).removeSubLevel(body, SubLevelRemovalReason.REMOVED);
             throw new IllegalStateException("Cannot keep practice part loaded");
         }
-        parts.add(new Part(body, name, offset, axis, weapon, side, physics.capturePose(level, body.getUniqueId()), blocks.size()));
+        Part part = new Part(body, name, offset, axis, weapon, side, physics.capturePose(level, body.getUniqueId()), blocks.size());
+        parts.add(part);
+        var states = new HashMap<BlockPos, net.minecraft.world.level.block.state.BlockState>();
+        for (BlockPos pos : physics.plotBlocks(level, body.getUniqueId(), 512)) states.put(pos.immutable(), level.getBlockState(pos));
+        part.structure = Map.copyOf(states);
     }
     public Set<UUID> ids() {
         var result = new LinkedHashSet<UUID>(); for (Part p : parts) result.add(p.body.getUniqueId()); return result;
@@ -131,7 +135,7 @@ public final class PracticeBot {
     }
     public boolean contains(UUID id) { return parts.stream().anyMatch(p -> p.body.getUniqueId().equals(id)); }
     public int lostParts() { return (int) parts.stream().skip(1).filter(p -> !p.attached()).count(); }
-    public boolean healthy() { return coreHealth > 0 && parts.stream().noneMatch(p -> p.body.isRemoved()); }
+    public boolean healthy() { return !parts.isEmpty() && coreHealth > 0 && parts.stream().noneMatch(p -> p.body.isRemoved()); }
     public void tune(int value) { tune = Math.floorMod(value, 3); }
     public void connect() {
         Part root = parts.getFirst();
@@ -207,7 +211,8 @@ public final class PracticeBot {
     public void repair() {
         for (Part p : parts) {
             if (p.body.isRemoved() || !physics.loaded(level, p.body.getUniqueId())
-                    || physics.plotBlocks(level, p.body.getUniqueId(), 512).size() != p.blockCount)
+                    || physics.plotBlocks(level, p.body.getUniqueId(), 512).size() != p.blockCount
+                    || p.structure.entrySet().stream().anyMatch(entry -> !level.getBlockState(entry.getKey()).equals(entry.getValue())))
                 throw new IllegalStateException("Starter bot was modified externally. Choose a fresh design.");
         }
         freeze();

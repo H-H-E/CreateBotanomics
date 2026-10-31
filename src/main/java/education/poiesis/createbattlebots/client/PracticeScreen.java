@@ -106,16 +106,18 @@ public final class PracticeScreen extends Screen {
             g.drawCenteredString(font, "Your world, inventory, and existing machines stay untouched.", width/2, height/2-28, 0xffb9c8ce);
             g.drawCenteredString(font, "No commands, coding, or second player needed.", width/2, height/2-9, 0xffeac38b);
         } else {
-            g.fill(6,6,width-6,75,0xbb142029);
+            g.fill(6,6,width-6,58,0xbb142029);
+            int bw = Math.min(110, Math.max(65, (width-190)/2));
             g.drawString(font,"YOU (GREEN)",14,13,0xffb1ef8e);
-            g.drawString(font,"SCRAPBOT (RED)",width-144,13,0xffff9b8d);
-            bar(g,14,26,120,state.health(),0xff83d567);
-            bar(g,width-144,26,120,state.enemyHealth(),0xffe27765);
-            g.drawString(font,"Parts lost: " + state.lost(),14,39,0xffffffff);
-            g.drawString(font,"Parts lost: " + state.enemyLost(),width-144,39,0xffffffff);
+            g.drawString(font,"SCRAPBOT (RED)",width-bw-14,13,0xffff9b8d);
+            bar(g,14,26,bw,state.health(),0xff83d567);
+            bar(g,width-bw-14,26,bw,state.enemyHealth(),0xffe27765);
+            g.drawString(font,"Lost: " + state.lost(),14,39,0xffffffff);
+            g.drawString(font,"Lost: " + state.enemyLost(),width-bw-14,39,0xffffffff);
             g.drawCenteredString(font,String.format(java.util.Locale.ROOT,"%d:%02d",state.seconds()/60,state.seconds()%60),width/2,14,0xffeac38b);
-            g.drawCenteredString(font,state.wins()+" wins / "+state.losses()+" losses  |  "+state.rpm()+" RPM",width/2,28,0xffdce6eb);
-            g.drawCenteredString(font,state.objective(),width/2,58,0xffffffff);
+            g.drawCenteredString(font,state.rpm()+" RPM",width/2,28,0xffdce6eb);
+            g.drawCenteredString(font,font.plainSubstrByWidth(state.objective(),width-20),width/2,49,0xffffffff);
+            g.drawCenteredString(font,state.wins()+" W / "+state.losses()+" L",width/2,39,0xffb9c8ce);
             int bottom = height-94;
             g.fill(6,bottom-4,width-6,height-4,0xb3142029);
             g.drawWordWrap(font,Component.literal(state.feedback()),12,bottom,Math.max(160,width-24),0xffeac38b);
@@ -123,7 +125,7 @@ public final class PracticeScreen extends Screen {
             String controls=o.keyUp.getTranslatedKeyMessage().getString()+"/"+o.keyDown.getTranslatedKeyMessage().getString()+" drive   "
                     +o.keyLeft.getTranslatedKeyMessage().getString()+"/"+o.keyRight.getTranslatedKeyMessage().getString()+" turn   "
                     +o.keyJump.getTranslatedKeyMessage().getString()+" weapon   "+o.keyShift.getTranslatedKeyMessage().getString()+" brake   Esc pause";
-            g.drawCenteredString(font,controls,width/2,height-65,0xffd3dce2);
+            g.drawCenteredString(font,font.plainSubstrByWidth(controls,width-20),width/2,height-65,0xffd3dce2);
             if (state.phase()==PracticeService.COUNTDOWN || state.phase()==PracticeService.PAUSED || state.phase()==PracticeService.REPAIRING)
                 g.drawCenteredString(font,state.phase()==PracticeService.PAUSED?"PAUSED":state.phase()==PracticeService.REPAIRING?"REATTACHING PARTS...":state.objective(),width/2,height/2-25,0xffeac38b);
         }

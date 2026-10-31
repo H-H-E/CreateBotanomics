@@ -47,7 +47,7 @@ repositories {
 }
 
 sourceSets {
-    smoke
+    smoke { compileClasspath += sourceSets.main.output }
     gametest {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
@@ -94,6 +94,7 @@ neoForge {
     mods {
         createbattlebots { sourceSet sourceSets.main }
         createbattlebots_test { sourceSet sourceSets.gametest }
+        createbattlebots_smoke { sourceSet sourceSets.smoke }
     }
     runs {
         client {
@@ -119,7 +120,7 @@ neoForge {
             client()
             sourceSet = sourceSets.smoke
             gameDirectory = file('run/packaged-client')
-            loadedMods = []
+            loadedMods = [mods.createbattlebots_smoke]
             if (providers.gradleProperty('joinWorld').isPresent()) {
                 programArguments.addAll '--quickPlaySingleplayer', providers.gradleProperty('joinWorld').get()
             }

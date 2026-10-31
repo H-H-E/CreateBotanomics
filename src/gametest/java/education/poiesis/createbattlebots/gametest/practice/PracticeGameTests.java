@@ -1,4 +1,7 @@
-package education.poiesis.createbattlebots.practice;
+package education.poiesis.createbattlebots.gametest.practice;
+
+import education.poiesis.createbattlebots.practice.PracticeBot;
+import education.poiesis.createbattlebots.practice.PracticeRules;
 
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
