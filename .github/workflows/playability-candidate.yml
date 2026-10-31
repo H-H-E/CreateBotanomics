@@ -12,16 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: e93746f65e7afa765e37d74883a61def9a35edb5
+          ref: 4d42eb81f3a8092cd037b73dd567423e2c23f4fb
       - name: Apply checksummed implementation patch
         env:
           GH_TOKEN: ${{ github.token }}
         shell: python
         run: |
           import base64, gzip, hashlib, json, os, pathlib, subprocess, urllib.request
-          req=urllib.request.Request('https://api.github.com/repos/H-H-E/CreateBotanomics/git/blobs/2ec66dad518f4019d88838eae3b23e20b9e6c913',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          req=urllib.request.Request('https://api.github.com/repos/H-H-E/CreateBotanomics/git/blobs/fac5bfab9aeb930b2f5619b315c11a199b546dcc',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
           with urllib.request.urlopen(req,timeout=60) as r: data=base64.b64decode(json.load(r)['content'])
-          assert hashlib.sha256(data).hexdigest()=='cb8559effe57a1b1a7a0b8f7afe0ea59ee99c23b3b73b862974af0e56548290b'
+          assert hashlib.sha256(data).hexdigest()=='2ed54ffb5600a9789095fd08d4909c036346fc5db07a0b4f255aa65e5d0cb18a'
           pathlib.Path('/tmp/implementation.patch').write_bytes(gzip.decompress(data))
           subprocess.run(['git','apply','--check','/tmp/implementation.patch'],check=True)
           subprocess.run(['git','apply','/tmp/implementation.patch'],check=True)
@@ -29,9 +29,9 @@ jobs:
         run: |
           git config user.name 'Hussein'
           git config user.email '59151492+H-H-E@users.noreply.github.com'
-          git add src build.gradle
-          git commit -m 'Isolate native tests and verify the packaged tutorial, driving, rematch and return UI'
-          git push origin HEAD:refs/heads/playability-candidate-2
+          git add src
+          git commit -m 'Correct differential steering and distribute traction through surviving running gear'
+          git push origin HEAD:refs/heads/playability-candidate-3
           mkdir -p evidence
           git rev-parse HEAD > evidence/commit.txt
           git archive --format=zip HEAD > evidence/source.zip
@@ -43,7 +43,9 @@ jobs:
       - name: Compile and run unit tests with Lanterns
         run: ./gradlew build --no-daemon -PwithLanterns=true -PwithComputerCraft=false
       - name: Native physics, collisions, detach and repair with Lanterns
-        run: ./gradlew runGameTestServer --no-daemon -PwithLanterns=true -PwithComputerCraft=false
+        id: native
+        continue-on-error: true
+        run: timeout 180s ./gradlew runGameTestServer --no-daemon -PwithLanterns=true -PwithComputerCraft=false
       - name: Verify optional Lanterns download
         run: python3 scripts/install_modpack.py --target /tmp/lanterns-install-check --with-lanterns --without-computercraft --mod-jar build/libs/createbattlebots-0.2.0+mc1.21.1.jar
       - name: Prepare exact-JAR integrated client
@@ -64,6 +66,9 @@ jobs:
           xvfb-run -a -s '-screen 0 1280x800x24' timeout 420s ./gradlew runPackagedClient --no-daemon -PjoinWorld=PracticeSmoke -PwithLanterns=true -PwithComputerCraft=false
           test -f run/packaged-client/smoke-success.txt
           cat run/packaged-client/smoke-success.txt
+      - name: Require native tests to pass
+        if: steps.native.outcome != 'success'
+        run: exit 1
       - name: Package distributions
         run: python3 scripts/package_release.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
