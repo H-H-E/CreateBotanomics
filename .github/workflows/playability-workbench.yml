@@ -1,0 +1,52 @@
+name: Playability workbench
+on:
+  push:
+    branches: [playability-validation]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+      - name: Build and test pinned baseline
+        run: ./gradlew build --no-daemon
+      - name: Export compilation workbench (no credentials or Gradle home)
+        run: |
+          cat > /tmp/workbench.gradle <<'GRADLE'
+          allprojects {
+            afterEvaluate {
+              tasks.register('exportWorkbench') {
+                dependsOn 'compileJava'
+                doLast {
+                  def out = file('build/workbench')
+                  out.mkdirs()
+                  def cp = sourceSets.main.compileClasspath.files + sourceSets.test.runtimeClasspath.files
+                  copy { from cp.findAll { it.isFile() && it.name.endsWith('.jar') }; into new File(out, 'jars') }
+                }
+              }
+            }
+          }
+          GRADLE
+          ./gradlew -I /tmp/workbench.gradle exportWorkbench --no-daemon
+          git archive --format=zip HEAD > build/workbench/repository.zip
+      - name: Run native integration tests
+        run: ./gradlew runGameTestServer --no-daemon
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: playability-workbench-${{ github.run_number }}
+          path: |
+            build/workbench/
+            build/reports/tests/
+            build/test-results/
+            run/gametest/logs/
+          retention-days: 1
+          if-no-files-found: error
