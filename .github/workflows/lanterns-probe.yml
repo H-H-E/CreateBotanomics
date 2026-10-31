@@ -1,0 +1,39 @@
+name: Lanterns dependency probe
+on:
+  push:
+    branches: [playability-validation]
+    paths: ['.github/workflows/lanterns-probe.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Inspect published requirements
+        shell: python
+        run: |
+          import urllib.request, json, pathlib, zipfile, hashlib, xml.etree.ElementTree as ET
+          out=pathlib.Path('probe');out.mkdir()
+          def get(url):
+              return urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Poiesis-BattleBots/compatibility-test'}),timeout=90).read()
+          versions=json.loads(get('https://api.modrinth.com/v2/project/sable/version'))
+          version=next(v for v in versions if 'neoforge' in v['loaders'] and '1.21.1' in v['game_versions'] and v['version_number']=='2.0.6')
+          (out/'sable-release.json').write_text(json.dumps(version,indent=2))
+          f=next(f for f in version['files'] if f['primary'])
+          (out/f['filename']).write_bytes(get(f['url']))
+          url='https://www.cursemaven.com/curse/maven/create-lanterns-1752310/9360511/create-lanterns-1752310-9360511.jar'
+          (out/'createlanterns-alpha-20.11.jar').write_bytes(get(url))
+          metadata=get('https://maven.ryanhcode.dev/snapshots/dev/ryanhcode/sable/sable-neoforge-1.21.1/maven-metadata.xml')
+          (out/'sable-maven.xml').write_bytes(metadata)
+          for p in out.glob('*.jar'):
+              print(p.name,hashlib.sha256(p.read_bytes()).hexdigest())
+              with zipfile.ZipFile(p) as z:
+                  print(z.read('META-INF/neoforge.mods.toml').decode())
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: lanterns-dependency-probe
+          path: probe/
+          retention-days: 1
