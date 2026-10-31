@@ -1,0 +1,105 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "minecraft:lever",
+      "required": false
+    },
+    {
+      "id": "#minecraft:buttons",
+      "required": false
+    },
+    {
+      "id": "create:analog_lever",
+      "required": false
+    },
+    {
+      "id": "create:controls",
+      "required": false
+    },
+    {
+      "id": "create:contraption_controls",
+      "required": false
+    },
+    {
+      "id": "create:rotation_speed_controller",
+      "required": false
+    },
+    {
+      "id": "create:lectern_controller",
+      "required": false
+    },
+    {
+      "id": "simulated:steering_wheel",
+      "required": false
+    },
+    {
+      "id": "simulated:throttle_lever",
+      "required": false
+    },
+    {
+      "id": "create:white_seat",
+      "required": false
+    },
+    {
+      "id": "create:orange_seat",
+      "required": false
+    },
+    {
+      "id": "create:magenta_seat",
+      "required": false
+    },
+    {
+      "id": "create:light_blue_seat",
+      "required": false
+    },
+    {
+      "id": "create:yellow_seat",
+      "required": false
+    },
+    {
+      "id": "create:lime_seat",
+      "required": false
+    },
+    {
+      "id": "create:pink_seat",
+      "required": false
+    },
+    {
+      "id": "create:gray_seat",
+      "required": false
+    },
+    {
+      "id": "create:light_gray_seat",
+      "required": false
+    },
+    {
+      "id": "create:cyan_seat",
+      "required": false
+    },
+    {
+      "id": "create:purple_seat",
+      "required": false
+    },
+    {
+      "id": "create:blue_seat",
+      "required": false
+    },
+    {
+      "id": "create:brown_seat",
+      "required": false
+    },
+    {
+      "id": "create:green_seat",
+      "required": false
+    },
+    {
+      "id": "create:red_seat",
+      "required": false
+    },
+    {
+      "id": "create:black_seat",
+      "required": false
+    }
+  ]
+}

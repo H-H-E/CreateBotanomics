@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "disabled=false": {
+      "model": "createbattlebots:block/battle_transponder"
+    },
+    "disabled=true": {
+      "model": "createbattlebots:block/battle_transponder_disabled"
+    }
+  }
+}

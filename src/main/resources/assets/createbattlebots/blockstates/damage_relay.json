@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "disabled=false": {
+      "model": "createbattlebots:block/damage_relay"
+    },
+    "disabled=true": {
+      "model": "createbattlebots:block/damage_relay_disabled"
+    }
+  }
+}

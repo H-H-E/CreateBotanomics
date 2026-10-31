@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "createbattlebots:block/arena_controller"
+    }
+  }
+}

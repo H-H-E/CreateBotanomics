@@ -1,0 +1,41 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/cracked_deepslate_tiles",
+    "remnant": "minecraft:block/cracked_deepslate_tiles"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#remnant"
+        },
+        "south": {
+          "texture": "#remnant"
+        },
+        "east": {
+          "texture": "#remnant"
+        },
+        "west": {
+          "texture": "#remnant"
+        },
+        "up": {
+          "texture": "#remnant"
+        },
+        "down": {
+          "texture": "#remnant"
+        }
+      }
+    }
+  ]
+}

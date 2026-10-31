@@ -1,0 +1,166 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+group = mod_group_id
+version = "${mod_version}+mc${minecraft_version}"
+base.archivesName = mod_id
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Create'
+        url = 'https://maven.createmod.net'
+        content { includeGroup 'com.simibubi.create' }
+    }
+    maven {
+        name = 'Sable'
+        url = 'https://maven.ryanhcode.dev/snapshots'
+        content {
+            includeGroup 'dev.ryanhcode.sable'
+            includeGroup 'dev.ryanhcode.sable-companion'
+        }
+    }
+    maven {
+        name = 'SableReleases'
+        url = 'https://maven.ryanhcode.dev/releases'
+        content { includeGroup 'dev.ryanhcode.sable-companion' }
+    }
+    exclusiveContent {
+        forRepository {
+            maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' }
+        }
+        filter { includeGroup 'maven.modrinth' }
+    }
+    maven {
+        name = 'ComputerCraft'
+        url = 'https://maven.squiddev.cc'
+        content { includeGroup 'cc.tweaked' }
+    }
+}
+
+sourceSets {
+    smoke
+    gametest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime
+    gametestImplementation.extendsFrom implementation
+    gametestCompileOnly.extendsFrom compileOnly
+    gametestRuntimeOnly.extendsFrom runtimeOnly, localRuntime
+    smokeImplementation.extendsFrom implementation
+    smokeRuntimeOnly.extendsFrom runtimeOnly, localRuntime
+}
+
+dependencies {
+    // Full upstream jars already contain their runtime libraries. No third-party
+    // classes are shaded into our distributable.
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
+    implementation("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") { transitive = false }
+    compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}") { transitive = false }
+    localRuntime("maven.modrinth:create-aeronautics:${aeronautics_modrinth_version}") { transitive = false }
+
+    compileOnly "cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${computercraft_version}"
+    compileOnly "cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${computercraft_version}"
+    if (providers.gradleProperty('withComputerCraft').orElse('true').get().toBoolean()) {
+        localRuntime("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${computercraft_version}") { transitive = false }
+    }
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+neoForge {
+    version = project.neo_version
+    addModdingDependenciesTo sourceSets.gametest
+    addModdingDependenciesTo sourceSets.smoke
+    mods {
+        createbattlebots { sourceSet sourceSets.main }
+        createbattlebots_test { sourceSet sourceSets.gametest }
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = file(providers.gradleProperty('clientDirectory').orElse('run/client').get())
+            loadedMods = [mods.createbattlebots]
+            if (providers.gradleProperty('playerName').isPresent()) {
+                programArguments.addAll '--username', providers.gradleProperty('playerName').get()
+            }
+            if (providers.gradleProperty('joinServer').isPresent()) {
+                programArguments.addAll '--quickPlayMultiplayer', providers.gradleProperty('joinServer').get()
+            }
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            gameDirectory = file('run/server')
+            loadedMods = [mods.createbattlebots]
+        }
+        // Copy the built primary JAR to run/packaged-client/mods first. No main
+        // source output is loaded, so this run exercises the actual distributable.
+        packagedClient {
+            client()
+            sourceSet = sourceSets.smoke
+            gameDirectory = file('run/packaged-client')
+            loadedMods = []
+            if (providers.gradleProperty('joinWorld').isPresent()) {
+                programArguments.addAll '--quickPlaySingleplayer', providers.gradleProperty('joinWorld').get()
+            }
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.gametest
+            gameDirectory = file('run/gametest')
+            loadedMods = [mods.createbattlebots, mods.createbattlebots_test]
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'createbattlebots,createbattlebots_test'
+        }
+        configureEach {
+            logLevel = org.slf4j.event.Level.INFO
+            jvmArgument "-Xmx${providers.gradleProperty('runMaxMemory').orElse('2G').get()}"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: project.version }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging { events 'passed', 'skipped', 'failed' }
+    maxHeapSize = '512m'
+}
+
+tasks.register('verifyReleaseVersion') {
+    doLast {
+        def requested = providers.gradleProperty('releaseModVersion').orNull
+        if (requested == null || requested != mod_version) {
+            throw new GradleException("Tag must match mod_version=${mod_version}; received ${requested}")
+        }
+    }
+}
+
+tasks.named('jar') {
+    from('LICENSE')
+    manifest.attributes('Implementation-Title': mod_name,
+            'Implementation-Version': project.version,
+            'Built-On-Minecraft': minecraft_version)
+}

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "createbattlebots:garage_console",
+    "createbattlebots:arena_controller"
+  ]
+}

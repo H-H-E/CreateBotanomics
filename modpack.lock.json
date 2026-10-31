@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "minecraft": "1.21.1",
+  "loader": {
+    "name": "neoforge",
+    "version": "21.1.247",
+    "installer_url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.247/neoforge-21.1.247-installer.jar",
+    "installer_sha256": "6fa14629491a796d75a39bc31b6e65eb3636b6ba2e1368577c061ba0591e8be4"
+  },
+  "java": 21,
+  "mods": [
+    {
+      "project": "create",
+      "version": "6.0.10+mc1.21.1",
+      "version_id": "UjX6dr61",
+      "filename": "create-1.21.1-6.0.10.jar",
+      "url": "https://cdn.modrinth.com/data/LNytGWDc/versions/UjX6dr61/create-1.21.1-6.0.10.jar",
+      "sha512": "11cc8fc049d2f67f6548c7abfada6b82a3adb5c7ca410a742de04bbca76e03862c518721b88d806f6e6d768a4d68531fdb903a85859b25d1484d550cc7bafd4b",
+      "size": 19123767,
+      "optional": false,
+      "sha1": "0e97e49837bed766e6f28a4c95b04885d6acc353"
+    },
+    {
+      "project": "sable",
+      "version": "2.0.4+mc1.21.1",
+      "version_id": "bMSNCogw",
+      "filename": "sable-neoforge-1.21.1-2.0.4.jar",
+      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/bMSNCogw/sable-neoforge-1.21.1-2.0.4.jar",
+      "sha512": "1536c676531f59d4658f994c698a8f649f3b21b0f7ff754644be5ff4154c88aba5f933686359198519bbe7d295e8d53f7d9148cfe0e93b09fe168f52ef4a33ed",
+      "size": 12986102,
+      "optional": false,
+      "sha1": "d3d0518f91b559a65d8548e9b6f0a2f88bbc81d3"
+    },
+    {
+      "project": "create-aeronautics",
+      "version": "1.3.2+mc1.21.1",
+      "version_id": "44pLdPGg",
+      "filename": "create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "url": "https://cdn.modrinth.com/data/oWaK0Q19/versions/44pLdPGg/create-aeronautics-bundled-1.21.1-1.3.2.jar",
+      "sha512": "dc7e8e1148fa442243889ba29412207137e1bb86206e6c92bc0a589f1374a466e93de22bdbf14f753984d86c29308fbbdc0f14a4b9618b14c0ac1666a36b46f5",
+      "size": 33123131,
+      "optional": false,
+      "sha1": "ddbe9cbc25e8f663218aa1e9fdfc4b99f0e11e4b"
+    },
+    {
+      "project": "cc-tweaked",
+      "version": "1.115.1",
+      "version_id": "h6qYZ1UT",
+      "filename": "cc-tweaked-1.21.1-forge-1.115.1.jar",
+      "url": "https://cdn.modrinth.com/data/gu7yAYhd/versions/h6qYZ1UT/cc-tweaked-1.21.1-forge-1.115.1.jar",
+      "sha512": "a9580e569243592448955fa9f65e96b0efe7275df62b0c49e8fd9cf6c07546ea006a00a6c0aa30bb4e7d441cc0a3b79607388c1dab1efad45afec5bf4a9a48b7",
+      "size": 3092195,
+      "optional": true,
+      "sha1": "3fcea43ed79139a7d6f69f2a2ad93db021760171"
+    }
+  ]
+}

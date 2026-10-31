@@ -1,0 +1,14 @@
+.gradle/
+build/
+run/
+.deps/
+.idea/
+*.iml
+.vscode/
+*.log
+*.hprof
+/server/
+/client-instance/
+.DS_Store
+__pycache__/
+*.py[cod]

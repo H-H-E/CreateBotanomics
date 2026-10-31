@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "createbattlebots:battle_transponder",
+    "createbattlebots:combat_armor",
+    "createbattlebots:damage_relay"
+  ]
+}

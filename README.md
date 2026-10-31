@@ -142,8 +142,9 @@ pinned distribution checksum. Build output:
 
 `runClient`, `runServer`, and `runGameTestServer` are configured development runs.
 The GameTests are in a separate source set and never enter the production JAR.
-CI checks ComputerCraft both present and absent. Tagged releases verify that the
-tag agrees with `mod_version` before rebuilding and publishing the tested files.
+CI checks ComputerCraft both present and absent. A version change on `main` or an
+explicit version tag can publish a release after both configurations pass. The
+workflow validates `mod_version` and never replaces an existing version's assets.
 
 See [verification evidence](docs/VERIFICATION.md) for what was actually run and
 which play scenarios still need broader playtesting. Compilation alone is not a
