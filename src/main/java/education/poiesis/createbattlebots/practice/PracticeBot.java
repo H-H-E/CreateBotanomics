@@ -165,7 +165,7 @@ public final class PracticeBot {
             RigidBodyHandle partHandle = RigidBodyHandle.of(p.body);
             if (partHandle == null || !partHandle.isValid()) continue;
             Vector3d axis = root.body.logicalPose().orientation().transform(new Vector3d(p.axis));
-            double target = p.weapon ? weaponSpeed : (input.brake() ? 0 : input.throttle() * 4.5 + input.turn() * p.side * 1.8);
+            double target = p.weapon ? weaponSpeed : (input.brake() ? 0 : input.throttle() * 4.5 - input.turn() * p.side * 1.8);
             double rate = partHandle.getAngularVelocity().dot(axis);
             double delta = PracticeRules.clamp(target - rate, -0.65, 0.65);
             partHandle.addLinearAndAngularVelocity(new Vector3d(), new Vector3d(axis).mul(delta));
@@ -179,7 +179,7 @@ public final class PracticeBot {
         Vector3d velocity = handle.getLinearVelocity(new Vector3d());
         double limit = design == CRAWLER ? 4.2 : tune == 2 ? 6 : 7;
         double wanted = input.brake() ? 0 : input.throttle() * limit * grip;
-        double acceleration = PracticeRules.clamp(wanted - velocity.dot(forward), -0.22, 0.22) * grip;
+        double acceleration = PracticeRules.clamp(wanted - velocity.dot(forward), -0.42, 0.42) * grip;
         // Only supply ground traction near the floor. Airborne robots keep their momentum.
         if (position().y > 69.5) return;
         Vector3d impulse = forward.mul(acceleration).add(side.mul(-velocity.dot(side) * 0.09 * grip));
@@ -187,6 +187,12 @@ public final class PracticeBot {
         double desiredYaw = input.brake() ? 0 : input.turn() * 1.4 * grip + (right - left) * input.throttle() * 0.35;
         handle.addLinearAndAngularVelocity(impulse,
                 new Vector3d(0, PracticeRules.clamp(desiredYaw - yawRate, -0.12, 0.12), 0));
+        // Apply ground-drive assistance to the connected chassis, not just its heaviest
+        // block group. Otherwise leg/weapon inertia cancels most input at each joint.
+        for (Part p : parts.subList(1, parts.size())) if (p.attached()) {
+            RigidBodyHandle attached = RigidBodyHandle.of(p.body);
+            if (attached != null && attached.isValid()) attached.addLinearAndAngularVelocity(new Vector3d(impulse), new Vector3d());
+        }
     }
     /** Returns the visibly detached component, or an empty string for a non-terminal hit. */
     public String hit(UUID body, double damage, long tick) {
