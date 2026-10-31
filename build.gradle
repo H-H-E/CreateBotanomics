@@ -14,6 +14,7 @@ java {
 
 repositories {
     mavenCentral()
+    maven { url = "https://www.cursemaven.com"; content { includeGroup "curse.maven" } }
     maven {
         name = 'Create'
         url = 'https://maven.createmod.net'
@@ -67,7 +68,7 @@ dependencies {
     // Full upstream jars already contain their runtime libraries. No third-party
     // classes are shaded into our distributable.
     implementation("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
-    implementation("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") { transitive = false }
+    implementation("maven.modrinth:sable:${sable_modrinth_version}") { transitive = false }
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}") { transitive = false }
     localRuntime("maven.modrinth:create-aeronautics:${aeronautics_modrinth_version}") { transitive = false }
 
@@ -75,6 +76,10 @@ dependencies {
     compileOnly "cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${computercraft_version}"
     if (providers.gradleProperty('withComputerCraft').orElse('true').get().toBoolean()) {
         localRuntime("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${computercraft_version}") { transitive = false }
+    }
+
+    if (providers.gradleProperty("withLanterns").orElse("false").get().toBoolean()) {
+        localRuntime("curse.maven:create-lanterns-1752310:${lanterns_curse_file}") { transitive = false }
     }
 
     testImplementation platform('org.junit:junit-bom:5.11.4')

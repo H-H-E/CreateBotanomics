@@ -22,14 +22,14 @@
     },
     {
       "project": "sable",
-      "version": "2.0.4+mc1.21.1",
-      "version_id": "bMSNCogw",
-      "filename": "sable-neoforge-1.21.1-2.0.4.jar",
-      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/bMSNCogw/sable-neoforge-1.21.1-2.0.4.jar",
-      "sha512": "1536c676531f59d4658f994c698a8f649f3b21b0f7ff754644be5ff4154c88aba5f933686359198519bbe7d295e8d53f7d9148cfe0e93b09fe168f52ef4a33ed",
-      "size": 12986102,
+      "version": "2.0.6+mc1.21.1",
+      "version_id": "fg9dTRz9",
+      "filename": "sable-neoforge-1.21.1-2.0.6.jar",
+      "url": "https://cdn.modrinth.com/data/T9PomCSv/versions/fg9dTRz9/sable-neoforge-1.21.1-2.0.6.jar",
+      "sha512": "76d293ce751a01cb9c095a3659b0a41e03e005480bc9d76dfdc73ec7c2eabf7923740c7b077921d42616673c496cd5143569f2085ddcebe174fd91d81e2a04b8",
+      "size": 12986135,
       "optional": false,
-      "sha1": "d3d0518f91b559a65d8548e9b6f0a2f88bbc81d3"
+      "sha1": "cf46f7e8c1511f170abcdbee739944f0540549bf"
     },
     {
       "project": "create-aeronautics",
@@ -52,6 +52,20 @@
       "size": 3092195,
       "optional": true,
       "sha1": "3fcea43ed79139a7d6f69f2a2ad93db021760171"
+    },
+    {
+      "project": "create-lanterns",
+      "version": "20.11-alpha",
+      "curseforge_project_id": 1752310,
+      "curseforge_file_id": 9360511,
+      "filename": "createlanterns-alpha-20.11.jar",
+      "url": "https://mediafilez.forgecdn.net/files/9360/511/createlanterns-alpha-20.11.jar",
+      "sha512": "dbf12aa4d77fe7ac6bc56eb1373969d75adebcfd4f0a32bb44862624d9f1490800fe49ab4884adb71a21132ce013a8ed42ba8bc955b998dde99edf0c06fdebad",
+      "sha1": "9211ce976e107a5c933900dbd197cc83301bd882",
+      "sha256": "e68dbf736332f4034c8d68c46847e330d0d663fc65f40fe3bcd6b4019f92a215",
+      "size": 3367496,
+      "optional": true,
+      "default": false
     }
   ]
 }

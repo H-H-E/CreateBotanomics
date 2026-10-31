@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Install the locked runtime without redistributing third-party mod binaries.
 
-Client: python3 scripts/install_modpack.py --target /path/to/instance --mod-jar build/libs/createbattlebots-0.1.0+mc1.21.1.jar
+Client: python3 scripts/install_modpack.py --target /path/to/instance --mod-jar build/libs/createbattlebots-0.2.0+mc1.21.1.jar
 Server: add --server, and read https://aka.ms/MinecraftEULA before --accept-eula.
 The client instance must already use the locked NeoForge version and Java 21.
 """
@@ -42,7 +42,7 @@ def download(url: str, destination: Path, checksum: str, algorithm: str, size: i
     if destination.exists():
         raise ValueError(f"{destination} exists but differs from the lock. Move it aside before retrying.")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    request = urllib.request.Request(url, headers={"User-Agent": "Poiesis-CreateBattleBots/0.1.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "Poiesis-CreateBattleBots/0.2.0"})
     temporary: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(dir=destination.parent, suffix=".download", delete=False) as output:
@@ -88,6 +88,7 @@ def main() -> None:
     parser.add_argument("--target", type=Path, required=True, help="Minecraft instance or new dedicated-server folder")
     parser.add_argument("--mod-jar", type=Path, required=True, help="Built Create: Battle Bots distributable JAR")
     parser.add_argument("--without-computercraft", action="store_true", help="Skip the optional Lua-computer mod")
+    parser.add_argument("--with-lanterns", action="store_true", help="Install optional Create: Lanterns alpha-20.11 with Sable 2.0.6")
     parser.add_argument("--server", action="store_true", help="Install the locked NeoForge dedicated server")
     parser.add_argument("--accept-eula", action="store_true", help="Confirm you accept https://aka.ms/MinecraftEULA")
     parser.add_argument("--java", default="java", help="Java 21 executable, used for server installation")
@@ -107,9 +108,15 @@ def main() -> None:
         raise ValueError("Move the previous Battle Bots version out of mods before upgrading: " + ", ".join(map(str, other_versions)))
 
     for mod in lock["mods"]:
-        if mod["optional"] and args.without_computercraft:
+        if mod["project"] == "cc-tweaked" and args.without_computercraft:
+            continue
+        if mod["project"] == "create-lanterns" and not args.with_lanterns:
             continue
         name = mod["filename"]
+        if mod["project"] == "sable":
+            old = [p.name for p in mods.glob("sable-neoforge-*.jar") if p.name != name]
+            if old:
+                raise ValueError("Move old Sable JARs out of mods before upgrading to 2.0.6: " + ", ".join(old))
         if Path(name).name != name:
             raise ValueError("Unsafe filename in modpack lock")
         download(mod["url"], mods / name, mod["sha512"], "sha512", mod["size"])

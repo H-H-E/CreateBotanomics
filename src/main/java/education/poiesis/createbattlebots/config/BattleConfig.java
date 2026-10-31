@@ -5,12 +5,18 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 public final class BattleConfig {
     public static final ModConfigSpec SPEC;
+    public static final ModConfigSpec.BooleanValue PRACTICE_ENABLED;
+    public static final ModConfigSpec.IntValue PRACTICE_SLOTS;
     public static final ModConfigSpec.IntValue ROUND_SECONDS, COUNTDOWN_SECONDS, MAX_BOT_BLOCKS,
             MAX_BODIES, MAX_CONTACTS, MAX_NODE_FAILURES, MAX_ARENA_SIDE, MAX_ARENAS;
     public static final ModConfigSpec.DoubleValue IMPACT_SCALE, MAX_HIT_DAMAGE;
     public static final ModConfigSpec.BooleanValue RING_OUT, AUTO_REPAIR;
     static {
         var b = new ModConfigSpec.Builder();
+        b.push("practice");
+        PRACTICE_ENABLED = b.comment("Allow players to enter the isolated starter-bot AI arena.").define("enabled", true);
+        PRACTICE_SLOTS = b.comment("Maximum simultaneous private practice bays.").defineInRange("maxSessions", 4, 1, 8);
+        b.pop();
         b.comment("Server-authoritative tournament rules. Changes apply to the next match.").push("match");
         ROUND_SECONDS = b.defineInRange("roundSeconds", 180, 10, 3600);
         COUNTDOWN_SECONDS = b.defineInRange("countdownSeconds", 5, 1, 60);

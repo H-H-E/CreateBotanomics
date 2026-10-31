@@ -11,6 +11,7 @@ public final class BattleBotsTestMod {
 
     public BattleBotsTestMod() {
         SableEventPlatform.INSTANCE.onPostPhysicsTick((system, step) -> {
+            education.poiesis.createbattlebots.practice.PracticeGameTests.capture(system);
             PhysicsGameTests.ContactProbe probe = PhysicsGameTests.contactProbe;
             if (probe != null && probe.level() == system.getLevel()) {
                 for (SablePhysicsAdapter.ImpactContact contact : probe.adapter().drainContacts(system.getLevel(), 1024)) {

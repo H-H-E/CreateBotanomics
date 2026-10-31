@@ -38,7 +38,7 @@ def main():
                     "server": "optional" if mod["optional"] else "required"},
             "downloads": [mod["url"]],
             "fileSize": mod["size"],
-        } for mod in lock["mods"]],
+        } for mod in lock["mods"] if mod.get("default", True)],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(args.output, "w", zipfile.ZIP_DEFLATED) as archive:
